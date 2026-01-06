@@ -3,7 +3,6 @@ import wavio as wv
 import time
 import sys
 import os
-
 sampling_frequency = 48000
 
 filename = input("What do you wish to name the recording file?: ")
@@ -26,7 +25,15 @@ if os.path.exists(f'{filename}.wav'):
 
 
 
-recording_duration = float(input("How many seconds do you wish to record for?: "))
+while True:
+    try:
+        recording_duration = float(input("How many seconds do you wish to record for?: "))
+        if recording_duration <= 0:
+            print("Recording duration must be greater than 0 seconds.")
+            continue
+        break
+    except ValueError:
+        print("Please enter a valid number for duration.")
 channels = 1
 
 def countdown(t):
@@ -42,11 +49,21 @@ def countdown(t):
 
 
 print("Recording has begun please begin speaking into mic")
-recording = sd.rec(int(recording_duration*sampling_frequency), samplerate=sampling_frequency, channels=channels)
-countdown(recording_duration)
-sd.wait()
-print()
-print("Recording finished.")
+
+try:
+    recording = sd.rec(
+        int(recording_duration * sampling_frequency),
+        samplerate=sampling_frequency,
+        channels=channels
+    )
+    countdown(recording_duration)
+    sd.wait()
+    print("\nRecording finished.")
+except Exception as e:
+    print("\nRecording failed.")
+    print(f"Error: {e}")
+    sys.exit(1)
+
 
 def find_file_anywhere(filename, search_path='/'):
     for root, dirs, files in os.walk(search_path):
