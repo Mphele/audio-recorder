@@ -1,14 +1,31 @@
 import sounddevice as sd
-from scipy.io.wavfile import write
 import wavio as wv 
 import time
 import sys
-import numpy as np
 import os
-from pathlib import Path
 
 sampling_frequency = 48000
+
 filename = input("What do you wish to name the recording file?: ")
+if os.path.exists(f'{filename}.wav'):
+        while True:
+            overwrite = input(f"An audio with the name {filename} already exists in this directory, do you want to rename (R) your current file or overwrite (O) the existing one?: ").lower()
+            if overwrite not in ['o', 'r']:
+                print("Please either enter 'O' for overwrite or 'R' for rename")
+                continue
+            break
+        if overwrite == 'r':
+            while True:
+                filename = input("What is the new name you wish to give the file?: ")
+                if os.path.exists(f'{filename}.wav'):
+                    print("Filename already exists please enter unique filename")
+                    continue
+                break
+        if overwrite == 'o':
+            print("File overwritten")
+
+
+
 recording_duration = float(input("How many seconds do you wish to record for?: "))
 channels = 1
 
@@ -42,5 +59,20 @@ file_to_find = f"{filename}.wav"
 found_location = find_file_anywhere(file_to_find, search_path= os.getcwd()) 
 
 print(f"Audio file saved as {filename}.wav at {found_location}")
+
+while True:
+    playback = input("Do you want to playback the audio you just saved?(yes/no): ").lower()
+    if playback not in ['yes', 'no']:
+        print("Please enter either yes or no")
+        continue
+    break
+
+if playback =='yes':
+    print("Playing recording...")
+    sd.play(recording,sampling_frequency)
+    sd.wait()
+    print("Playback finished.")
+
+
 
 
